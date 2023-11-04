@@ -23,7 +23,7 @@ fn main() {
                 // Check path
                 match path.chars().nth(0).unwrap() {
                     '/' => {
-                        let body = path.split("/").nth(2).expect("no body");
+                        let body = path.split("/").nth(2).unwrap_or("no body");
                         println!("body: {}", body);
                         let body_length = body.len();
                         response = format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{}", body_length, body).to_string();

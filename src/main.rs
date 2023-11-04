@@ -5,7 +5,6 @@ use std::io::Read;
 fn main() {
     // Uncomment this block to pass the first stage
     let listener = TcpListener::bind("127.0.0.1:4221").unwrap();
-    println!("listening to 127.0.0.1:4221");
 
     for stream in listener.incoming() {
         match stream {

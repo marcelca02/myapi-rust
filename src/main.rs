@@ -17,13 +17,14 @@ fn main() {
                 let res = String::from_utf8(buf.to_vec()).unwrap();
                 println!("request received: {}", res);
                 let first_line = res.split("\r\n").next().expect("no first line");
-                let path = first_line.split(" ").nth(1).unwrap();
+                let path = first_line.split(" ").nth(1).unwrap_or("no path");
                 println!("path: {}", path);
                 let response;
+                let path_elements = path.split("/");
                 // Check path
-                match path.chars().nth(0).unwrap() {
-                    '/' => {
-                        let body = path.split("/").nth(2).unwrap_or("no body");
+                match path_elements.clone().nth(1).unwrap_or("wrong path") {
+                    "echo" => {
+                        let body = path_elements.clone().nth(2).unwrap_or("no body");
                         println!("body: {}", body);
                         let body_length = body.len();
                         response = format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{}", body_length, body).to_string();
@@ -32,6 +33,7 @@ fn main() {
                             .expect("failed to write OK response");
                     },
                     _ => {
+                        println!("wrong path");
                         response = "HTTP/1.1 404 NOT FOUND\r\n\r\n".to_string();
                         _stream
                             .write(response.as_bytes())

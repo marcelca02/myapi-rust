@@ -5,6 +5,7 @@ use std::io::Read;
 fn main() {
     // Uncomment this block to pass the first stage
     let listener = TcpListener::bind("127.0.0.1:4221").unwrap();
+    println!("listening to 127.0.0.1 4221");
 
     for stream in listener.incoming() {
         match stream {
@@ -20,15 +21,18 @@ fn main() {
                 println!("path: {}", path);
                 let response;
                 // Check path
-                match path {
-                    "/" => {
-                        response = "HTTP/1.1 200 OK\r\n\r\n";
+                match path.chars().nth(0).unwrap() {
+                    '/' => {
+                        let body = path.split("/").nth(2).unwrap();
+                        println!("body: {}", body);
+                        let body_length = body.len();
+                        response = format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{}", body_length, body).to_string();
                         _stream
                             .write(response.as_bytes())
                             .expect("failed to write OK response");
                     },
                     _ => {
-                        response = "HTTP/1.1 404 NOT FOUND\r\n\r\n";
+                        response = "HTTP/1.1 404 NOT FOUND\r\n\r\n".to_string();
                         _stream
                             .write(response.as_bytes())
                             .expect("failed to write NOT FOUND response");

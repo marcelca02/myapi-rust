@@ -18,11 +18,10 @@ fn main() {
                 let first_line = res.split("\r\n").next().expect("no first line");
                 let path = first_line.split(" ").nth(1).unwrap();
                 println!("path: {}", path);
-                let path_start = path.chars().next().unwrap();
                 let response;
                 // Check path
-                match path_start {
-                    '/' => {
+                match path {
+                    "/" => {
                         response = "HTTP/1.1 200 OK\r\n\r\n";
                         _stream
                             .write(response.as_bytes())

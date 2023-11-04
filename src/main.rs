@@ -23,6 +23,13 @@ fn main() {
                 let path_elements = path.split("/");
                 // Check path
                 match path_elements.clone().nth(1).unwrap_or("wrong path") {
+                    "" => {
+                        println!("empty path");
+                        response = "HTTP/1.1 200 OK\r\n\r\n".to_string();
+                        _stream
+                            .write(response.as_bytes())
+                            .expect("failed to write OK response");
+                    },
                     "echo" => {
                         let body = path_elements.clone().nth(2).unwrap_or("no body");
                         println!("body: {}", body);

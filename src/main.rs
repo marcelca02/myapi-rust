@@ -1,43 +1,37 @@
 use std::net::TcpListener;
-use std::io::Write;
 use std::io::Read;
 
 mod parsers;
+mod config;
+
 
 fn main() {
-    // Uncomment this block to pass the first stage
-    let listener = TcpListener::bind("127.0.0.1:4221").unwrap();
-    println!("listening to 127.0.0.1 4221");
+    // Create a new TcpListener and bind it to the HOST and PORT
+    let listener = TcpListener::bind(format!("{}:{}", config::HOST, config::PORT)).unwrap();
+    println!("Listening on {}:{}", config::HOST, config::PORT);
 
     for stream in listener.incoming() {
         match stream {
+            // New connection
             Ok(mut _stream) => {
-                println!("accepted new connection");
-                let mut req = [0u8; 1024];
-                _stream
-                    .read(&mut req)
-                    .unwrap();
-                let req = String::from_utf8(req.to_vec()).unwrap();
-                let res;
-                println!("request received: {}", req);
+                println!("Accepted new connection, reading request...");
 
-                // Check path
-                match req.as_str() {
-                    "" => {
-                        println!("empty request");
-                        res = "HTTP/1.1 404 NOT FOUND\r\n\r\n".to_string();
-                        _stream
-                            .write(res.as_bytes())
-                            .expect("failed to write OK response");
-                    },
-                    _ => {
-                        let path = parsers::http::get_path(req).unwrap();
-                        println!("path: {}", path);
-                    }                    
-                }
+                let mut req = [0u8; 1024];
+                _stream.read(&mut req).unwrap();
+                let req = String::from_utf8(req.to_vec()).unwrap();
+
+                println!("Request received: {}", req);
+
+                let(method, path, headers) = parsers::http::parse_request(req).unwrap();
+                let form = parsers::http::parse_form(headers).unwrap();
+
+                println!("Method: {}", method);
+                println!("Path: {}", path);
+                println!("Form: {:?}", form);
+
             },
             Err(e) => {
-                println!("error: {}", e);
+                println!("Error: {}", e);
             }
         }
     }

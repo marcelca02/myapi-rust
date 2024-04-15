@@ -1,7 +1,11 @@
 [package]
 name = "myapi-rust"
 version = "0.1.0"
-authors = ["Marcel"]
+authors = ["Marcel marcel.calleja@estudiantat.upc.edu"]
+
+[lib]
+name = "myapi_rust"
+path = "src/lib.rs"
 
 [dependencies]
 regex = "1.10.4"

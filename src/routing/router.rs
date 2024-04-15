@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 
 use crate::routing::route::Route;
-use crate::http::methods::*;
+use crate::http::{methods::HttpMethod,request::Request, response::Response};
 
 
 
@@ -20,11 +20,20 @@ impl Router {
 
     // Constructor
     pub fn new() -> Self {
+        let mut methods = HashMap::new();
+        methods.insert("GET".to_string(), Vec::<Route>::new());
+        methods.insert("POST".to_string(), Vec::<Route>::new());
+        methods.insert("PUT".to_string(), Vec::<Route>::new());
+        methods.insert("DELETE".to_string(), Vec::<Route>::new());
+        methods.insert("OPTIONS".to_string(), Vec::<Route>::new());
+        methods.insert("PATCH".to_string(), Vec::<Route>::new());
+
         Router {
-            routes: HashMap::new(),
+            routes: methods,
             num_routes: 0,
         }
     }
+
     // Private method to create a new Route
     fn register_route(&mut self, method: HttpMethod, path: &str, action: Box<dyn Fn()>) {
         let method = method.to_string();
@@ -32,8 +41,21 @@ impl Router {
         self.routes.entry(method).or_insert(Vec::new()).push(route);
     }
 
+    //Resolvers
+    pub fn resolve_route(&self, req: &Request) -> &Route {
+        let method = req.get_method().to_string();
+        let routes = self.routes.get(&method).unwrap();
+        let mut route = routes.iter().find(|r| r.get_uri() == req.get_uri());
+        match route {
+            Some(r) => r,
+            None => panic!("404 Route not found")
+        }
+    }
 
-    // TODO: Resolvers taking request as a parameter
+    // pub fn resolve(&self, req: &Request) -> Response {
+    //
+    // }
+
 
     
     // PUBLIC API METHODS

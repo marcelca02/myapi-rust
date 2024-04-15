@@ -10,7 +10,7 @@ pub struct Request {
     uri: String,
     route: Route,
     method: HttpMethod,
-    body_data: Vec<u8>,
+    body_data: Option<Vec<u8>>,
     headers: HashMap<String, String>
     //TODO: parameters and files
 }
@@ -22,9 +22,21 @@ impl Request {
             uri: uri.to_string(), 
             route, 
             method,
-            body_data: data,
+            body_data: Some(data),
             headers
         }
+    }
+
+    pub fn get_uri(&self) -> &str {
+        &self.uri
+    }
+
+    pub fn get_route(&self) -> &Route {
+        &self.route
+    }
+
+    pub fn get_method(&self) -> &HttpMethod {
+        &self.method
     }
 
     pub fn get_header_field(&self, key: &str) -> Option<&str> {

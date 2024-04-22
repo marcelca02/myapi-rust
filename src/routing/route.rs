@@ -4,14 +4,14 @@ use crate::http::comm::{Request, Response};
 
 pub struct Route {
     uri: String,
-    action: Box<dyn Fn(&Request, &mut Response) -> Response>, 
+    action: Box<dyn for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response>, 
     parameters: Vec<String>,
     // TODO: Implement regex for uri and middlewares
 }
 
 #[allow(dead_code)]
 impl Route {
-    pub fn new(uri: &str, action: Box<dyn Fn(&Request, &mut Response) -> Response>) -> Self {
+    pub fn new(uri: &str, action: Box<dyn for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response>) -> Self {
         Route {
             uri: uri.to_string(),
             action,
@@ -25,7 +25,7 @@ impl Route {
         &self.uri
     }
 
-    pub fn get_action(&self) -> &Box<dyn Fn(&Request, &mut Response) -> Response>{
+    pub fn get_action(&self) -> &Box<dyn for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response> {
         &self.action
     }
 

@@ -1,11 +1,12 @@
 // File contains the structures for handling request and response in the server api
 
-// Request structure for handling request in the server api
 
 use std::collections::HashMap;
 
 use crate::http::methods::HttpMethod;
 use crate::routing::route::Route;
+
+// Request structure for handling request in the server api
 
 #[allow(dead_code)]
 pub struct Request {
@@ -15,6 +16,15 @@ pub struct Request {
     body_data: Option<Vec<u8>>,
     headers: HashMap<String, u8>
     //TODO: parameters and files
+}
+
+// Response structure for handling response in the server api
+
+#[allow(dead_code)]
+pub struct Response {
+    status: u16,
+    headers: HashMap<String, u8>,
+    response_body: Option<Vec<u8>>,
 }
 
 #[allow(dead_code)]
@@ -49,14 +59,6 @@ impl Request {
     }
 }
 
-// Response structure for handling response in the server api
-
-#[allow(dead_code)]
-pub struct Response {
-    status: u16,
-    headers: HashMap<String, u8>,
-    response_body: Vec<u8>,
-}
 
 #[allow(dead_code)]
 impl Response {
@@ -66,7 +68,7 @@ impl Response {
         Response {
             status: 404,
             headers: HashMap::new(),
-            response_body: Vec::new()
+            response_body: Some(Vec::new())
         }
     }
     
@@ -74,7 +76,7 @@ impl Response {
         Response {
             status: status_code,
             headers, 
-            response_body: body
+            response_body: Some(body)
         }
     }
 

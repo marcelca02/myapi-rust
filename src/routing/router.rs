@@ -50,13 +50,17 @@ impl Router {
         }
     }
 
-    // pub fn resolve(&self, req: &Request) -> RouteHandler { 
-    // let route = self.resolve_route(req);
-    //     match route {
-    //         Some(r) => r.get_action().clone(),
-    //         None => panic!("404 Route not found"),
-    //     }
-    // }
+    pub fn resolve(&self, req: &Request) -> Response { 
+        let route = self.resolve_route(req);
+        match route {
+            Some(r) => {
+                let mut res = Response::empty();
+                r.get_action()(req, &mut res);
+                res
+            },
+            None => Response::empty(),
+        }
+    }
     
     // PUBLIC API METHODS
 

@@ -4,7 +4,6 @@ use std::io::Read;
 
 use crate::routing::router::Router;
 use crate::config;
-use crate::utils::parsers;
 use crate::http::comm::{Request, Response};
 
 pub struct App {
@@ -36,14 +35,7 @@ impl App {
 
                     let mut req = [0u8; 1024];
                     _stream.read(&mut req).unwrap();
-                    let req = String::from_utf8_lossy(&req);
-
-                    let(method, path, _headers) = parsers::parse_request(req.to_string()).unwrap(); 
-                    // let _form = utils::parsers::parse_form(headers).unwrap();
-
-                    println!("Method: {}", method);
-                    println!("Path: {}", path);
-                    // println!("Form: {:?}", form);
+                    let _req = String::from_utf8_lossy(&req);
 
                 },
                 Err(e) => {

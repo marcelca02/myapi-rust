@@ -3,8 +3,7 @@
 use std::collections::HashMap;
 
 use crate::routing::route::Route;
-use crate::http::{methods::HttpMethod,comm::Request};
-use crate::routing::handler::Handler;
+use crate::http::{methods::HttpMethod,comm::{Request,Response}};
 
 // TODO: Implement my own HashMap
 #[allow(dead_code)]
@@ -34,7 +33,7 @@ impl Router {
     }
     
     // Private method to create a new Route
-    fn register_route(&mut self, method: HttpMethod, path: &str, action: Box<dyn Handler>) {
+    fn register_route(&mut self, method: HttpMethod, path: &str, action: Box<dyn Fn(&Request, &mut Response) -> Response>) {
         let method = method.to_string();
         let route = Route::new(path, action);
         self.routes.entry(method).or_insert(Vec::new()).push(route);
@@ -51,43 +50,56 @@ impl Router {
         }
     }
 
-    pub fn resolve(&self, req: &Request) -> Box<dyn Handler> { 
-    let route = self.resolve_route(req);
-        match route {
-            Some(r) => r.get_action().clone(),
-            None => panic!("404 Route not found"),
-        }
-    }
+    // pub fn resolve(&self, req: &Request) -> RouteHandler { 
+    // let route = self.resolve_route(req);
+    //     match route {
+    //         Some(r) => r.get_action().clone(),
+    //         None => panic!("404 Route not found"),
+    //     }
+    // }
     
     // PUBLIC API METHODS
 
     // Public method to create a new GET Route
-    pub fn get(&mut self, path: &str, action: Box<dyn Handler>) {
-        self.register_route(HttpMethod::GET, path, action);
+    pub fn get<F>(&mut self, path: &str, action: F) 
+        where F: Fn(&Request, &mut Response) -> Response + 'static 
+    {
+        self.register_route(HttpMethod::GET, path, Box::new(action));
     }
 
     // Public method to create a new POST Route
-    pub fn post(&mut self, path: &str, action: Box<dyn Handler>) {
-        self.register_route(HttpMethod::POST, path, action);
+    pub fn post<F>(&mut self, path: &str, action: F) 
+        where F: Fn(&Request, &mut Response) -> Response + 'static 
+    {
+        self.register_route(HttpMethod::POST, path, Box::new(action));
     }
 
     // Public method to create a new PUT Route
-    pub fn put(&mut self, path: &str, action: Box<dyn Handler>) {
-        self.register_route(HttpMethod::PUT, path, action);
+    pub fn put<F>(&mut self, path: &str, action: F) 
+        where F: Fn(&Request, &mut Response) -> Response + 'static 
+    {
+        self.register_route(HttpMethod::PUT, path, Box::new(action));
     }
 
     // Public method to create a new DELETE Route
-    pub fn delete(&mut self, path: &str, action: Box<dyn Handler>) {
-        self.register_route(HttpMethod::DELETE, path, action);
+    pub fn delete<F>(&mut self, path: &str, action: F) 
+        where F: Fn(&Request, &mut Response) -> Response + 'static 
+    {
+        self.register_route(HttpMethod::DELETE, path, Box::new(action));
     }
 
     // Public method to create a new OPTIONS Route
-    pub fn options(&mut self, path: &str, action: Box<dyn Handler>) {
-        self.register_route(HttpMethod::OPTIONS, path, action);
+    pub fn options<F>(&mut self, path: &str, action: F) 
+        where F: Fn(&Request, &mut Response) -> Response + 'static 
+    {
+        self.register_route(HttpMethod::OPTIONS, path, Box::new(action));
     }
 
     // Public method to create a new PATCH Route
-    pub fn patch(&mut self, path: &str, action: Box<dyn Handler>) {
-        self.register_route(HttpMethod::PATCH, path, action);
+    pub fn patch<F>(&mut self, path: &str, action: F) 
+        where F: Fn(&Request, &mut Response) -> Response + 'static 
+    {
+        self.register_route(HttpMethod::PATCH, path, Box::new(action));
     }
+
 }

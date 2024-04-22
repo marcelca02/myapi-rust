@@ -64,7 +64,7 @@ impl Response {
     // Empty constructor
     pub fn empty() -> Self {
         Response {
-            status: 200,
+            status: 404,
             headers: HashMap::new(),
             response_body: Vec::new()
         }

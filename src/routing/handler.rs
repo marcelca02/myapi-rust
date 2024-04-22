@@ -1,24 +1,13 @@
-// Here we define the Handler trait and the Cloneable trait.
 
-pub trait Handler: Cloneable {
-    fn handle(&self) -> String;
+use crate::http::comm::{Request, Response};
+
+pub trait RouteHandler: Fn(&Request, &mut Response) -> Response {
+    fn call(&self, req: &Request, res: &mut Response) -> Response;
 }
 
-trait Cloneable {
-    fn clone_box(&self) -> Box<dyn Handler>;
-}
-
-impl<T: 'static + Handler + Clone> Cloneable for T {
-    fn clone_box(&self) -> Box<dyn Handler> {
-        Box::new(self.clone())
+impl RouteHandler for Box<dyn Fn(&Request, &mut Response) -> Response> {
+    fn call(&self, req: &Request, res: &mut Response) -> Response {
+        self(req, res)
     }
 }
-
-impl Clone for Box<dyn Handler> {
-    fn clone(&self) -> Box<dyn Handler> {
-        self.clone_box()
-    }
-}
-
-
 

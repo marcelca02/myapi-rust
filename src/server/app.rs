@@ -1,33 +1,30 @@
 use std::net::TcpListener;
+use std::net::SocketAddr;
 use std::io::Read;
 
 use crate::routing::router::Router;
 use crate::config;
-use crate::routing::handler::Handler;
 use crate::utils::parsers;
+use crate::http::comm::{Request, Response};
 
 pub struct App {
-    host: String,
-    port: u16,
+    address: SocketAddr,
     router: Router,
 }
 
 #[allow(dead_code)]
 impl App {
-    pub fn new() -> Self {
+    pub fn new(address: &str, port: u16) -> Self {
         App {
-            host: config::HOST.to_string(),
-            port: config::PORT,
+            address: format!("{}:{}", address, port).parse().unwrap(),
             router: Router::new()
         }
     }
 
-    pub fn run(&mut self, host: String, port: u16) {
-        self.host = host;
-        self.port = port; 
+    pub fn run(&mut self) {
 
         // Create a new TcpListener and bind it to the HOST and PORT
-        let listener = TcpListener::bind(format!("{}:{}", config::HOST, config::PORT)).unwrap();
+        let listener = TcpListener::bind(self.address).unwrap();
         println!("Listening on {}:{}", config::HOST, config::PORT);
 
         // Event loop for receiving requests
@@ -57,32 +54,44 @@ impl App {
     }
 
     // Public method to create a new GET Route
-    pub fn get(&mut self, path: &str, action: Box<dyn Handler>) {
+    pub fn get<F>(&mut self, path: &str, action: F) 
+        where F: Fn(&Request, &mut Response) -> Response + 'static
+    {
         self.router.get(path, action);
     }
 
     // Public method to create a new POST Route
-    pub fn post(&mut self, path: &str, action: Box<dyn Handler>) {
+    pub fn post<F>(&mut self, path: &str, action: F) 
+        where F: Fn(&Request, &mut Response) -> Response + 'static
+    {
         self.router.post(path, action);
     }
 
     // Public method to create a new PUT Route
-    pub fn put(&mut self, path: &str, action: Box<dyn Handler>) {
+    pub fn put<F>(&mut self, path: &str, action: F) 
+        where F: Fn(&Request, &mut Response) -> Response + 'static
+    {
         self.router.put(path, action);
     }
-    
+
     // Public method to create a new DELETE Route
-    pub fn delete(&mut self, path: &str, action: Box<dyn Handler>) {
+    pub fn delete<F>(&mut self, path: &str, action: F) 
+        where F: Fn(&Request, &mut Response) -> Response + 'static
+    {
         self.router.delete(path, action);
     }
 
     // Public method to create a new OPTIONS Route
-    pub fn options(&mut self, path: &str, action: Box<dyn Handler>) {
+    pub fn options<F>(&mut self, path: &str, action: F) 
+        where F: Fn(&Request, &mut Response) -> Response + 'static
+    {
         self.router.options(path, action);
     }
 
     // Public method to create a new PATCH Route
-    pub fn patch(&mut self, path: &str, action: Box<dyn Handler>) {
+    pub fn patch<F>(&mut self, path: &str, action: F) 
+        where F: Fn(&Request, &mut Response) -> Response + 'static
+    {
         self.router.patch(path, action);
     }
 }

@@ -1,18 +1,17 @@
 // Route structure for handling routes in the server api
 
-use crate::routing::handler::Handler;
+use crate::http::comm::{Request, Response};
 
-#[derive(Clone)]
 pub struct Route {
     uri: String,
-    action: Box<dyn Handler>, 
+    action: Box<dyn Fn(&Request, &mut Response) -> Response>, 
     parameters: Vec<String>,
     // TODO: Implement regex for uri and middlewares
 }
 
 #[allow(dead_code)]
 impl Route {
-    pub fn new(uri: &str, action: Box<dyn Handler>) -> Self {
+    pub fn new(uri: &str, action: Box<dyn Fn(&Request, &mut Response) -> Response>) -> Self {
         Route {
             uri: uri.to_string(),
             action,
@@ -26,7 +25,7 @@ impl Route {
         &self.uri
     }
 
-    pub fn get_action(&self) -> &Box<dyn Handler> {
+    pub fn get_action(&self) -> &Box<dyn Fn(&Request, &mut Response) -> Response>{
         &self.action
     }
 

@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 
 use crate::routing::route::Route;
-use crate::http::{methods::HttpMethod,comm::{Request,Response}};
+use crate::http::{methods::HttpMethod,comm::{Request,Response}, status::HttpStatus};
 
 // TODO: Implement my own HashMap
 #[allow(dead_code)]
@@ -55,6 +55,7 @@ impl Router {
         match route {
             Some(r) => {
                 let mut res = Response::empty();
+                res.set_status(HttpStatus::Ok);
                 r.get_action()(req, &mut res);
                 res
             },

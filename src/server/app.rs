@@ -1,4 +1,4 @@
-use std::net::TcpListener;
+use std::net::{TcpListener, TcpStream};
 use std::net::SocketAddr;
 use std::io::Read;
 
@@ -13,12 +13,6 @@ pub struct App {
 
 #[allow(dead_code)]
 impl App {
-    pub fn new(address: &str, port: u16) -> Self {
-        App {
-            address: format!("{}:{}", address, port).parse().unwrap(),
-            router: Router::new()
-        }
-    }
 
     pub fn run(&mut self) {
 
@@ -28,21 +22,35 @@ impl App {
 
         // Event loop for receiving requests
         for stream in listener.incoming() {
-            match stream {
-                // New connection
-                Ok(mut _stream) => {
-                    println!("Accepted new connection, reading request...");
-
-                    let mut req = [0u8; 1024];
-                    _stream.read(&mut req).unwrap();
-                    let _req = String::from_utf8_lossy(&req);
-
-                },
-                Err(e) => {
-                    println!("Error: {}", e);
-                }
-            }
+            let stream = stream.unwrap();
+            App::handle_connection(&self, stream);
+            break;
         }
+    }
+
+    pub fn new(address: &str, port: u16) -> Self {
+        App {
+            address: format!("{}:{}", address, port).parse().unwrap(),
+            router: Router::new()
+        }
+    }
+
+    fn handle_connection(&self, mut stream: TcpStream) {
+
+        let mut buffer = [0; 1024];
+
+        // Read the incoming data from the stream
+        stream.read(&mut buffer).unwrap();
+        let request = String::from_utf8_lossy(&buffer[..]);
+
+        // Create a new Request object
+        let req = Request::new(&request);
+
+        // Create a new Response object
+        let res = self.router.resolve(&req);
+
+        println!("{}", res);
+        
     }
 
     // Public method to create a new GET Route

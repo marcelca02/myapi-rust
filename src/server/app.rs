@@ -56,6 +56,7 @@ impl App {
     fn handle_connection(cloned: Arc<Router>, stream: TcpStream) {
         let mut buffer = [0; 1024];
 
+        // Try reading from the stream until it is successful
         while !stream.try_read(&mut buffer).is_ok() {}
 
         let request = String::from_utf8_lossy(&buffer[..]);
@@ -66,7 +67,8 @@ impl App {
         // Resolve the request
         let res = cloned.resolve(&req);
 
-        println!("{}", res);
+        // Try writing to the stream until it is successful
+        while !stream.try_write(res.to_string().as_bytes()).is_ok() {}
 
     }
 

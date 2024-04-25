@@ -56,9 +56,32 @@ impl Response {
         self
     }
 
-    pub fn set_json_body(&mut self, body: Vec<u8>) -> &mut Self {
+    /// Set the response contnet type to plain text
+    /// Takes a string as the body of the response
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// let mut res = Response::empty();
+    /// res.send("Hello, World!");
+    /// ```
+    pub fn send(&mut self, body: &str) -> &mut Self {
+        self.headers.insert("Content-Type".to_string(), "text/plain".to_string());
+        self.set_body(body.into())
+    }
+
+    /// Set the response content type to JSON
+    /// Takes a string as the body of the response
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// let mut res = Response::empty();
+    /// res.json(r#"{"message": "Hello, World!"}"#);
+    /// ```
+    pub fn json(&mut self, body: &str) -> &mut Self {
         self.headers.insert("Content-Type".to_string(), "application/json".to_string());
-        self.response_body = Some(body);
+        self.response_body = Some(body.into());
         self
     }
 

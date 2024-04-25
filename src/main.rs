@@ -17,12 +17,12 @@ async fn main() {
 
     app.get("/bye", |_req, res| {
         let body = "Goodbye World".to_string();
-        res.set_body(body.into())
+        res.send(&body)
     });
 
     app.get("/json", |_req, res| {
         let json_message = r#"{"message": "Hello World"}"#;
-        res.set_json_body(json_message.into())
+        res.json(json_message)
     });
 
     app.run().await;

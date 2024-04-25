@@ -26,6 +26,15 @@ impl Clone for App {
 #[allow(dead_code)]
 impl App {
 
+    /// Method to run the server
+    /// This method listens for incoming requests and spawns a new thread to handle each request
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// let mut app = App::new("127.0.0.1", 8080);
+    /// app.run().await;
+    /// ```
     pub async fn run(&mut self) {
 
         // Create a new TcpListener and bind it to the HOST and PORT
@@ -47,6 +56,14 @@ impl App {
     }
 
 
+    /// Constructor for the App structure
+    /// Takes the address and port as arguments
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// let mut app = App::new("127.0.0.1", 8080);
+    /// ```
     pub fn new(address: &str, port: u16) -> Self {
         App {
             address: format!("{}:{}", address, port).parse().unwrap(),

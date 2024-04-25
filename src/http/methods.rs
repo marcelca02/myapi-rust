@@ -1,6 +1,6 @@
 use std::fmt::{self, Debug};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum HttpMethod {
     GET,
     POST,

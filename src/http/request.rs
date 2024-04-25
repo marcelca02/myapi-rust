@@ -6,6 +6,7 @@ use crate::utils::parsers;
 
 // Request structure for handling request in the server api
 
+#[derive(Clone)]
 pub struct Request {
     version: String,
     uri: String,
@@ -14,6 +15,19 @@ pub struct Request {
     headers: HashMap<String, u8>
     //TODO: parameters and files
 }
+
+impl std::fmt::Debug for Request {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{{ {}\r\n{}\r\n{:}\r\n{:?}\r\n}}", self.version, self.uri, self.method, self.headers)
+    }
+}
+
+impl std::fmt::Display for Request {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{} {}\r\n{:?}\r\n{:?}", self.method, self.uri, self.headers, self.body_data)
+    }
+}
+
 
 impl Request {
 
@@ -37,10 +51,12 @@ impl Request {
         }
     }
 
-    pub fn new(request: &str) -> Self {
+    pub fn new(request: &str) -> Result<Self, std::io::Error> {
         let mut req = Request::empty();
-        parsers::parse_request(request.to_string(), &mut req).unwrap();
-        req
+        match parsers::parse_request(request.to_string(), &mut req) {
+            Ok(_) => Ok(req),
+            Err(err) => Err(err)
+        }
     }
 
     pub fn set_version(&mut self, version: &str) {

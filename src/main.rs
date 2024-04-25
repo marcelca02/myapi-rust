@@ -10,5 +10,20 @@ async fn main() {
         res
     });
 
+    app.post("/epa", |_req, res| {
+        println!("Goodbye World");
+        res
+    });
+
+    app.get("/bye", |_req, res| {
+        let body = "Goodbye World".to_string();
+        res.set_body(body.into())
+    });
+
+    app.get("/json", |_req, res| {
+        let json_message = r#"{"message": "Hello World"}"#;
+        res.set_json_body(json_message.into())
+    });
+
     app.run().await;
 }

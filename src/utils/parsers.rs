@@ -4,7 +4,7 @@ use std::io::Error;
 use std::collections::HashMap;
 
 use crate::http::methods::HttpMethod;
-use crate::http::comm::Request;
+use crate::http::request::Request;
 
 #[allow(dead_code)]
 pub fn parse_request(request: String, my_req: &mut Request) -> Result<(), Error> {

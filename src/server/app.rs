@@ -6,7 +6,7 @@ use std::sync::Arc;
 
 use crate::routing::router::Router;
 use crate::config;
-use crate::http::comm::{Request, Response};
+use crate::http::{request::Request, response::Response};
 
 pub struct App {
     address: SocketAddr,

@@ -1,3 +1,4 @@
 pub(crate) mod methods;
-pub(crate) mod comm;
+pub(crate) mod request;
+pub(crate) mod response;
 pub(crate) mod status;

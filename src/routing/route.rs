@@ -1,7 +1,7 @@
 // Route structure for handling routes in the server api
 use std::sync::{Arc, Mutex};
 
-use crate::http::comm::{Request, Response};
+use crate::http::{request::Request, response::Response};
 
 pub struct Route {
     uri: String,

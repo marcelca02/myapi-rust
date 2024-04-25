@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 
 use crate::routing::route::Route;
-use crate::http::{methods::HttpMethod,comm::{Request,Response}, status::HttpStatus};
+use crate::http::{methods::HttpMethod,request::Request,response::Response, status::HttpStatus};
 
 // TODO: Implement my own HashMap
 pub struct Router {

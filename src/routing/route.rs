@@ -10,8 +10,6 @@ pub struct Route {
     // TODO: Implement regex for uri and middlewares
 }
 
-unsafe impl Send for Route {}
-unsafe impl Sync for Route {}
 
 impl std::fmt::Debug for Route {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

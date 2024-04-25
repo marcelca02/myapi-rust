@@ -34,6 +34,8 @@ impl Clone for Router {
 #[allow(dead_code)]
 impl Router {
 
+    
+
     // Constructor
     pub fn new() -> Self {
         let mut methods = HashMap::new();
@@ -68,7 +70,13 @@ impl Router {
         }
     }
 
+    //    
+    //  This method will resolve the request and return a response, by checking
+    //  the existance of the route in the routes HashMap of the Aplication server.        //
+    //     -->  It will return an empty response if the route is not found.
+    //
     pub fn resolve(&self, req: &Request) -> Response { 
+
         let route = self.resolve_route(req);
         match route {
             Some(r) => {

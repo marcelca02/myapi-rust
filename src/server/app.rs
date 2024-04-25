@@ -2,8 +2,7 @@ extern crate tokio;
 
 use tokio::net::{TcpListener, TcpStream};
 use std::net::SocketAddr;
-use std::sync::{Arc, Mutex};
-use std::thread::current;
+use std::sync::Arc;
 
 use crate::routing::router::Router;
 use crate::config;
@@ -32,17 +31,16 @@ impl App {
         let listener = TcpListener::bind(&self.address).await.expect("Failed to bind to address");
         println!("Listening on {}:{}", config::HOST, config::PORT);
 
-        let arc = Arc::new(Mutex::new(self.clone()));
+        let arc = Arc::new(self.router.clone());
 
         // Event loop for receiving requests
         loop {
-            let (socket, _) = listener.accept().await.expect("Failed to accept connection");
+            let (stream, _) = listener.accept().await.expect("Failed to accept connection");
             let cloned = Arc::clone(&arc);
                 
             // Spawn a new thread to handle the connection
             tokio::spawn(async move {
-                let app = cloned.lock().unwrap();
-                app.handle_connection(socket);
+                App::handle_connection(cloned, stream);
             });
         }
     }
@@ -55,21 +53,21 @@ impl App {
         }
     }
 
-    fn handle_connection(&self, stream: TcpStream) {
-
+    fn handle_connection(cloned: Arc<Router>, stream: TcpStream) {
         let mut buffer = [0; 1024];
 
         while !stream.try_read(&mut buffer).is_ok() {}
-        
+
         let request = String::from_utf8_lossy(&buffer[..]);
 
         // Create a new Request object
         let req = Request::new(&request);
 
-        // Create a new Response object
-        let res = self.router.resolve(&req);
+        // Resolve the request
+        let res = cloned.resolve(&req);
 
         println!("{}", res);
+
     }
 
     // Public method to create a new GET Route

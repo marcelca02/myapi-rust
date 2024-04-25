@@ -11,7 +11,7 @@ use crate::http::status::HttpStatus;
 pub struct Response {
     version: String,
     status: HttpStatus,
-    headers: HashMap<String, u8>,
+    headers: HashMap<String, String>,
     response_body: Option<Vec<u8>>,
 }
 
@@ -24,19 +24,23 @@ impl Response {
     pub fn empty() -> Self {
         Response {
             version: "HTTP/1.1".to_string(),
-            status: HttpStatus::Ok,
+            status: HttpStatus::NotFound,
             headers: HashMap::new(),
             response_body: Some(Vec::new())
         }
     }
     
-    pub fn new(&mut self, status_code: HttpStatus, headers: HashMap<String, u8>, body: Vec<u8>) -> Self {
+    pub fn new(&mut self, status_code: HttpStatus, headers: HashMap<String, String>, body: Vec<u8>) -> Self {
         Response {
             version: "HTTP/1.1".to_string(),
             status: status_code,
-            headers, 
+            headers,
             response_body: Some(body)
         }
+    }
+
+    pub fn get_version(&self) -> &str {
+        &self.version
     }
 
     pub fn get_status(&self) -> &HttpStatus {
@@ -47,8 +51,15 @@ impl Response {
         self.status = status;
     }
 
-    pub fn set_body(&mut self, body: Vec<u8>) {
+    pub fn set_body(&mut self, body: Vec<u8>) -> &mut Self {
         self.response_body = Some(body);
+        self
+    }
+
+    pub fn set_json_body(&mut self, body: Vec<u8>) -> &mut Self {
+        self.headers.insert("Content-Type".to_string(), "application/json".to_string());
+        self.response_body = Some(body);
+        self
     }
 
 }

@@ -31,10 +31,7 @@ impl Clone for Router {
 
 
 
-#[allow(dead_code)]
 impl Router {
-
-    
 
     // Constructor
     pub fn new() -> Self {

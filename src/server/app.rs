@@ -7,6 +7,7 @@ use std::sync::Arc;
 use crate::routing::router::Router;
 use crate::config;
 use crate::http::{request::Request, response::Response};
+use crate::http::status::HttpStatus;
 
 pub struct App {
     address: SocketAddr,
@@ -64,11 +65,24 @@ impl App {
         // Create a new Request object
         let req = Request::new(&request);
 
-        // Resolve the request
-        let res = cloned.resolve(&req);
+        let mut res = Response::empty();
+        
+        match &req {
+            Ok(req) => {
+                // Resolve the request
+                res = cloned.resolve(&req);
+            },
+            Err(_) => {
+                // Set the status to BadRequest if the request is invalid
+                res.set_status(HttpStatus::BadRequest)
+            }
+        }
 
         // Try writing to the stream until it is successful
         while !stream.try_write(res.to_string().as_bytes()).is_ok() {}
+
+        // Print debug information
+        println!("[{:} {:}] Number of bytes: {:?}",res.get_version(), res.get_status().to_string(), req.expect("0").to_string().len());
 
     }
 

@@ -6,11 +6,29 @@ use crate::routing::route::Route;
 use crate::http::{methods::HttpMethod,comm::{Request,Response}, status::HttpStatus};
 
 // TODO: Implement my own HashMap
-#[allow(dead_code)]
 pub struct Router {
     routes: HashMap<String, Vec<Route>>,
     num_routes: usize,
 }
+
+unsafe impl Send for Router {}
+unsafe impl Sync for Router {}
+
+impl std::fmt::Debug for Router {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Router {{ routes: {:?}, num_routes: {} }}", self.routes, self.num_routes)
+    }
+}
+
+impl Clone for Router {
+    fn clone(&self) -> Self {
+        Router {
+            routes: self.routes.clone(),
+            num_routes: self.num_routes,
+        }
+    }
+}
+
 
 
 #[allow(dead_code)]
@@ -56,7 +74,9 @@ impl Router {
             Some(r) => {
                 let mut res = Response::empty();
                 res.set_status(HttpStatus::Ok);
-                r.get_action()(req, &mut res);
+                let action = r.get_action();
+                let action = action.lock().unwrap();
+                action(req, &mut res);
                 res
             },
             None => Response::empty(),

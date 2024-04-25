@@ -1,7 +1,8 @@
 extern crate myapi_rust;
 use myapi_rust::App;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut app = App::new("127.0.0.1", 4221);
 
     app.get("/hello", |_req, res| {
@@ -9,5 +10,5 @@ fn main() {
         res
     });
 
-    app.run();
+    app.run().await;
 }

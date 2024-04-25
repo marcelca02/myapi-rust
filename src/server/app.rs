@@ -1,6 +1,9 @@
-use std::net::{TcpListener, TcpStream};
+extern crate tokio;
+
+use tokio::net::{TcpListener, TcpStream};
 use std::net::SocketAddr;
-use std::io::Read;
+use std::sync::{Arc, Mutex};
+use std::thread::current;
 
 use crate::routing::router::Router;
 use crate::config;
@@ -11,22 +14,39 @@ pub struct App {
     router: Router,
 }
 
+impl Clone for App {
+    fn clone(&self) -> Self {
+        App {
+            address: self.address,
+            router: self.router.clone(),
+        }
+    }
+}
+
 #[allow(dead_code)]
 impl App {
 
-    pub fn run(&mut self) {
+    pub async fn run(&mut self) {
 
         // Create a new TcpListener and bind it to the HOST and PORT
-        let listener = TcpListener::bind(self.address).unwrap();
+        let listener = TcpListener::bind(&self.address).await.expect("Failed to bind to address");
         println!("Listening on {}:{}", config::HOST, config::PORT);
 
+        let arc = Arc::new(Mutex::new(self.clone()));
+
         // Event loop for receiving requests
-        for stream in listener.incoming() {
-            let stream = stream.unwrap();
-            App::handle_connection(&self, stream);
-            break;
+        loop {
+            let (socket, _) = listener.accept().await.expect("Failed to accept connection");
+            let cloned = Arc::clone(&arc);
+                
+            // Spawn a new thread to handle the connection
+            tokio::spawn(async move {
+                let app = cloned.lock().unwrap();
+                app.handle_connection(socket);
+            });
         }
     }
+
 
     pub fn new(address: &str, port: u16) -> Self {
         App {
@@ -35,12 +55,12 @@ impl App {
         }
     }
 
-    fn handle_connection(&self, mut stream: TcpStream) {
+    fn handle_connection(&self, stream: TcpStream) {
 
         let mut buffer = [0; 1024];
 
-        // Read the incoming data from the stream
-        stream.read(&mut buffer).unwrap();
+        while !stream.try_read(&mut buffer).is_ok() {}
+        
         let request = String::from_utf8_lossy(&buffer[..]);
 
         // Create a new Request object
@@ -50,7 +70,6 @@ impl App {
         let res = self.router.resolve(&req);
 
         println!("{}", res);
-        
     }
 
     // Public method to create a new GET Route

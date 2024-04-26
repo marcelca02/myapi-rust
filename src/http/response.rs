@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use std::fmt;
 
 use crate::http::status::HttpStatus;
+use crate::utils::formatter;
 
 // Response structure for handling response in the server api
 
@@ -83,6 +84,22 @@ impl Response {
         self.headers.insert("Content-Type".to_string(), "application/json".to_string());
         self.response_body = Some(body.into());
         self
+    }
+
+    pub fn render_template(&mut self, file_path: &str, params: HashMap<String, String>) -> &mut Self {
+        self.headers.insert("Content-Type".to_string(), "text/html".to_string());
+
+        match formatter::format_html(file_path, params) {
+            Ok(body) => {
+                self.response_body = Some(body.into());
+                return self;
+            },
+            Err(e) => {
+                self.status = HttpStatus::InternalServerError;
+                println!("Error: {}", e);
+                return self;
+            }
+        }
     }
 
 }

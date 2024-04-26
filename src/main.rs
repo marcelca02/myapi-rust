@@ -1,5 +1,6 @@
 extern crate myapi_rust;
 use myapi_rust::App;
+use std::collections::HashMap;
 
 #[tokio::main]
 async fn main() {
@@ -23,6 +24,11 @@ async fn main() {
     app.get("/json", |_req, res| {
         let json_message = r#"{"message": "Hello World"}"#;
         res.json(json_message)
+    });
+
+    app.get("/html", |_req, res| {
+        let params = HashMap::new();
+        res.render_template("example.html", params)
     });
 
     app.run().await;

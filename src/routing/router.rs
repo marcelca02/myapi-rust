@@ -90,46 +90,10 @@ impl Router {
     
     // PUBLIC API METHODS
 
-    // Public method to create a new GET Route
-    pub fn get<F>(&mut self, path: &str, action: F) 
+    pub fn store_route<F>(&mut self, method: HttpMethod, path: &str, action: F) 
         where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
     {
-        self.register_route(HttpMethod::GET, path, Box::new(action));
-    }
-
-    // Public method to create a new POST Route
-    pub fn post<F>(&mut self, path: &str, action: F) 
-        where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
-    {
-        self.register_route(HttpMethod::POST, path, Box::new(action));
-    }
-
-    // Public method to create a new PUT Route
-    pub fn put<F>(&mut self, path: &str, action: F) 
-        where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
-    {
-        self.register_route(HttpMethod::PUT, path, Box::new(action));
-    }
-
-    // Public method to create a new DELETE Route
-    pub fn delete<F>(&mut self, path: &str, action: F) 
-        where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
-    {
-        self.register_route(HttpMethod::DELETE, path, Box::new(action));
-    }
-
-    // Public method to create a new OPTIONS Route
-    pub fn options<F>(&mut self, path: &str, action: F) 
-        where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
-    {
-        self.register_route(HttpMethod::OPTIONS, path, Box::new(action));
-    }
-
-    // Public method to create a new PATCH Route
-    pub fn patch<F>(&mut self, path: &str, action: F) 
-        where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
-    {
-        self.register_route(HttpMethod::PATCH, path, Box::new(action));
+        self.register_route(method, path, Box::new(action));
     }
 
 }

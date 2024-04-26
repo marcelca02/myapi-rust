@@ -4,6 +4,7 @@ use tokio::net::{TcpListener, TcpStream};
 use std::net::SocketAddr;
 use std::sync::Arc;
 
+use crate::http::methods::HttpMethod;
 use crate::routing::router::Router;
 use crate::config;
 use crate::http::{request::Request, response::Response};
@@ -103,45 +104,111 @@ impl App {
 
     }
 
-    // Public method to create a new GET Route
+    /// Method to store a GET route in the server
+    /// Takes the path and a closure as arguments.
+    /// The clousre should take a Request and a mutable Response as arguments and return a mutable Response
+    ///
+    /// This clousre will be called when the route is resolved
+    ///
+    /// # Example
+    /// ```
+    /// app.get("/", |req, res| {
+    /// res
+    /// });
+    /// ```
     pub fn get<F>(&mut self, path: &str, action: F) 
         where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
     {
-        self.router.get(path, action);
+        self.router.store_route(HttpMethod::GET, path, action)
     }
 
-    // Public method to create a new POST Route
+    /// Method to store a POST route in the server
+    /// Takes the path and a closure as arguments.
+    /// The clousre should take a Request and a mutable Response as arguments and return a mutable Response
+    ///
+    /// This clousre will be called when the route is resolved
+    ///
+    /// # Example
+    /// ```
+    /// app.post("/", |req, res| {
+    /// res
+    /// });
+    /// ```
     pub fn post<F>(&mut self, path: &str, action: F) 
         where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
     {
-        self.router.post(path, action);
+        self.router.store_route(HttpMethod::POST, path, action);
     }
 
-    // Public method to create a new PUT Route
+    /// Method to store a PUT route in the server
+    /// Takes the path and a closure as arguments.
+    /// The clousre should take a Request and a mutable Response as arguments and return a mutable Response
+    ///
+    /// This clousre will be called when the route is resolved
+    ///
+    /// # Example
+    /// ```
+    /// app.put("/", |req, res| {
+    /// res
+    /// });
+    /// ```
     pub fn put<F>(&mut self, path: &str, action: F) 
         where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
     {
-        self.router.put(path, action);
+        self.router.store_route(HttpMethod::PUT, path, action);
     }
 
-    // Public method to create a new DELETE Route
+    /// Method to store a DELETE route in the server
+    /// Takes the path and a closure as arguments.
+    /// The clousre should take a Request and a mutable Response as arguments and return a mutable Response
+    ///
+    /// This clousre will be called when the route is resolved
+    ///
+    /// # Example
+    /// ```
+    /// app.delete("/", |req, res| {
+    /// res
+    /// });
+    /// ```
     pub fn delete<F>(&mut self, path: &str, action: F) 
         where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
     {
-        self.router.delete(path, action);
+        self.router.store_route(HttpMethod::DELETE, path, action);
     }
 
-    // Public method to create a new OPTIONS Route
+    /// Method to store a OPTIONS route in the server
+    /// Takes the path and a closure as arguments.
+    /// The clousre should take a Request and a mutable Response as arguments and return a mutable Response
+    ///
+    /// This clousre will be called when the route is resolved
+    ///
+    /// # Example
+    /// ```
+    /// app.options("/", |req, res| {
+    /// res
+    /// });
+    /// ```
     pub fn options<F>(&mut self, path: &str, action: F) 
         where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
     {
-        self.router.options(path, action);
+        self.router.store_route(HttpMethod::OPTIONS, path, action);
     }
 
-    // Public method to create a new PATCH Route
+    /// Method to store a PATCH route in the server
+    /// Takes the path and a closure as arguments.
+    /// The clousre should take a Request and a mutable Response as arguments and return a mutable Response
+    ///
+    /// This clousre will be called when the route is resolved
+    ///
+    /// # Example
+    /// ```
+    /// app.patch("/", |req, res| {
+    /// res
+    /// });
+    /// ```
     pub fn patch<F>(&mut self, path: &str, action: F) 
         where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
     {
-        self.router.patch(path, action);
+        self.router.store_route(HttpMethod::PATCH, path, action);
     }
 }

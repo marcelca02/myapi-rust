@@ -97,3 +97,67 @@ impl Router {
     }
 
 }
+
+
+#[cfg(test)]
+mod test_router {
+
+    #[test]
+    fn store_route() {
+        use crate::http::methods::HttpMethod;
+        use crate::http::request::Request;
+        use crate::routing::router::Router;
+
+        let mut router = Router::new();
+        router.store_route(HttpMethod::GET, "/hello", |_req, res| {
+            res
+        });
+
+
+        let req_str = "GET /hello HTTP/1.1\r\nHost: localhost:4221\r\nUser-Agent: curl/7.68.0\r\nAccept: */*\r\n\r\n";
+        let req = Request::new(req_str).unwrap();
+        let res = router.resolve(&req);
+        assert_eq!(res.get_status().to_string(), "200 OK");
+    }
+
+    #[test]
+    fn not_found() {
+        use crate::http::request::Request;
+        use crate::routing::router::Router;
+
+        let router = Router::new();
+
+        let req_str = "GET /world HTTP/1.1\r\nHost: localhost:4221\r\nUser-Agent: curl/7.68.0\r\nAccept: */*\r\n\r\n";
+        let req = Request::new(req_str).unwrap();
+        let res = router.resolve(&req);
+        assert_eq!(res.get_status().to_string(), "404 Not Found");
+    }
+
+    #[test]
+    fn resolve_ok() {
+        use crate::http::request::Request;
+        use crate::routing::router::Router;
+
+        let mut router = Router::new();
+        router.store_route(crate::http::methods::HttpMethod::GET, "/hello", |_req, res| {
+            res
+        });
+        let req = Request::new("GET /hello HTTP/1.1\r\nHost: localhost:4221\r\nUser-Agent: curl/7.68.0\r\nAccept: */*\r\n\r\n").unwrap();
+        let res = router.resolve(&req);
+        assert_eq!(res.get_status().to_string(), "200 OK");
+    }
+
+    #[test]
+    fn resolve_not_found() {
+        use crate::http::request::Request;
+        use crate::routing::router::Router;
+
+        let router = Router::new();
+        let req = Request::new("GET /world HTTP/1.1\r\nHost: localhost:4221\r\nUser-Agent: curl/7.68.0\r\nAccept: */*\r\n\r\n").unwrap();
+        let res = router.resolve(&req);
+        assert_eq!(res.get_status().to_string(), "404 Not Found");
+    }
+
+
+
+}

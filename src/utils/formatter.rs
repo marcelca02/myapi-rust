@@ -4,7 +4,7 @@ use std::io::Error;
 use std::path::Path;
 
 pub fn format_html(file_path: &str, params: HashMap<String, String>) -> Result<String, Error> {
-    let file_string = format!("./test/templates/{}", file_path);
+    let file_string = format!("./tests/templates/{}", file_path);
     let file= Path::new(&file_string);
 
     if !file.exists() {

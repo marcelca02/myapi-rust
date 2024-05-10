@@ -32,10 +32,10 @@ impl App {
     ///
     /// # Example
     ///
-    /// ```
+    /// 
     /// let mut app = App::new("127.0.0.1", 8080);
     /// app.run().await;
-    /// ```
+    /// 
     pub async fn run(&mut self) {
 
         // Create a new TcpListener and bind it to the HOST and PORT
@@ -62,9 +62,9 @@ impl App {
     ///
     /// # Example
     ///
-    /// ```
+    /// 
     /// let mut app = App::new("127.0.0.1", 8080);
-    /// ```
+    /// 
     pub fn new(address: &str, port: u16) -> Self {
         App {
             address: format!("{}:{}", address, port).parse().unwrap(),
@@ -104,6 +104,12 @@ impl App {
 
     }
 
+    pub fn stop(&self) {
+
+        
+
+    }
+
     /// Method to store a GET route in the server
     /// Takes the path and a closure as arguments.
     /// The clousre should take a Request and a mutable Response as arguments and return a mutable Response
@@ -111,11 +117,11 @@ impl App {
     /// This clousre will be called when the route is resolved
     ///
     /// # Example
-    /// ```
+    /// 
     /// app.get("/", |req, res| {
     /// res
     /// });
-    /// ```
+    /// 
     pub fn get<F>(&mut self, path: &str, action: F) 
         where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
     {
@@ -129,11 +135,11 @@ impl App {
     /// This clousre will be called when the route is resolved
     ///
     /// # Example
-    /// ```
+    /// 
     /// app.post("/", |req, res| {
     /// res
     /// });
-    /// ```
+    /// 
     pub fn post<F>(&mut self, path: &str, action: F) 
         where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
     {
@@ -147,11 +153,11 @@ impl App {
     /// This clousre will be called when the route is resolved
     ///
     /// # Example
-    /// ```
+    /// 
     /// app.put("/", |req, res| {
     /// res
     /// });
-    /// ```
+    /// 
     pub fn put<F>(&mut self, path: &str, action: F) 
         where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
     {
@@ -165,11 +171,11 @@ impl App {
     /// This clousre will be called when the route is resolved
     ///
     /// # Example
-    /// ```
+    /// 
     /// app.delete("/", |req, res| {
     /// res
     /// });
-    /// ```
+    /// 
     pub fn delete<F>(&mut self, path: &str, action: F) 
         where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
     {
@@ -183,11 +189,11 @@ impl App {
     /// This clousre will be called when the route is resolved
     ///
     /// # Example
-    /// ```
+    /// 
     /// app.options("/", |req, res| {
     /// res
     /// });
-    /// ```
+    /// 
     pub fn options<F>(&mut self, path: &str, action: F) 
         where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
     {
@@ -201,14 +207,16 @@ impl App {
     /// This clousre will be called when the route is resolved
     ///
     /// # Example
-    /// ```
+    /// 
     /// app.patch("/", |req, res| {
     /// res
     /// });
-    /// ```
+    /// 
     pub fn patch<F>(&mut self, path: &str, action: F) 
         where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
     {
         self.router.store_route(HttpMethod::PATCH, path, action);
     }
+
+
 }

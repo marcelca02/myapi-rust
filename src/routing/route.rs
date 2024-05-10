@@ -27,7 +27,6 @@ impl Clone for Route {
     }
 }
 
-#[allow(dead_code)]
 impl Route {
     pub fn new(uri: &str, action: Box<dyn for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response>) -> Self {
         Route {
@@ -47,10 +46,12 @@ impl Route {
         self.action.clone()
     }
 
+    #[allow(dead_code)]
     pub fn has_parameters(&self) -> bool {
         !self.parameters.is_empty()
     }
 
+    #[allow(dead_code)]
     pub fn get_parameters(&self) -> &Vec<String> {
         &self.parameters
     }

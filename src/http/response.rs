@@ -8,7 +8,6 @@ use crate::utils::formatter;
 
 // Response structure for handling response in the server api
 
-#[allow(dead_code)]
 pub struct Response {
     version: String,
     status: HttpStatus,
@@ -18,8 +17,65 @@ pub struct Response {
 
 
 
-#[allow(dead_code)]
 impl Response {
+
+    /// Set the response contnet type to plain text
+    /// Takes a string as the body of the response
+    ///
+    /// # Example
+    ///
+    /// 
+    /// let mut res = Response::empty();
+    /// res.send("Hello, World!");
+    /// 
+    pub fn send(&mut self, body: &str) -> &mut Self {
+        self.headers.insert("Content-Type".to_string(), "text/plain".to_string());
+        self.set_body(body.into())
+    }
+
+    /// Set the response content type to JSON
+    /// Takes a string as the body of the response
+    ///
+    /// # Example
+    ///
+    /// 
+    /// let mut res = Response::empty();
+    /// res.json(r#"{"message": "Hello, World!"}"#);
+    /// 
+    pub fn json(&mut self, body: &str) -> &mut Self {
+        self.headers.insert("Content-Type".to_string(), "application/json".to_string());
+        self.response_body = Some(body.into());
+        self
+    }
+
+    /// Render an HTML template
+    /// Takes a file path and a HashMap of parameters that will be replaced in the template
+    ///
+    /// This parameters must exist in the template file and be surrounded by double curly braces
+    /// like this:  {{param}} ```
+    ///
+    /// # Example
+    ///
+    /// 
+    /// let params = HashMap::new();
+    /// params.insert("name".to_string(), "John".to_string());
+    /// res.render_template("example.html", params);
+    /// 
+    pub fn render_template(&mut self, file_path: &str, params: HashMap<String, String>) -> &mut Self {
+        self.headers.insert("Content-Type".to_string(), "text/html".to_string());
+
+        match formatter::format_html(file_path, params) {
+            Ok(body) => {
+                self.response_body = Some(body.into());
+                return self;
+            },
+            Err(e) => {
+                self.status = HttpStatus::InternalServerError;
+                println!("Error: {}", e);
+                return self;
+            }
+        }
+    }
 
     // Empty constructor
     pub fn empty() -> Self {
@@ -48,6 +104,10 @@ impl Response {
         &self.status
     }
 
+    pub fn get_body(&self) -> Option<&Vec<u8>> {
+        self.response_body.as_ref()
+    }
+
     pub fn set_status(&mut self, status: HttpStatus) {
         self.status = status;
     }
@@ -56,52 +116,6 @@ impl Response {
         self.response_body = Some(body);
         self
     }
-
-    /// Set the response contnet type to plain text
-    /// Takes a string as the body of the response
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// let mut res = Response::empty();
-    /// res.send("Hello, World!");
-    /// ```
-    pub fn send(&mut self, body: &str) -> &mut Self {
-        self.headers.insert("Content-Type".to_string(), "text/plain".to_string());
-        self.set_body(body.into())
-    }
-
-    /// Set the response content type to JSON
-    /// Takes a string as the body of the response
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// let mut res = Response::empty();
-    /// res.json(r#"{"message": "Hello, World!"}"#);
-    /// ```
-    pub fn json(&mut self, body: &str) -> &mut Self {
-        self.headers.insert("Content-Type".to_string(), "application/json".to_string());
-        self.response_body = Some(body.into());
-        self
-    }
-
-    pub fn render_template(&mut self, file_path: &str, params: HashMap<String, String>) -> &mut Self {
-        self.headers.insert("Content-Type".to_string(), "text/html".to_string());
-
-        match formatter::format_html(file_path, params) {
-            Ok(body) => {
-                self.response_body = Some(body.into());
-                return self;
-            },
-            Err(e) => {
-                self.status = HttpStatus::InternalServerError;
-                println!("Error: {}", e);
-                return self;
-            }
-        }
-    }
-
 }
 
 impl fmt::Display for Response {
@@ -120,4 +134,7 @@ impl fmt::Display for Response {
         }
     }
 }
+
+
+
 

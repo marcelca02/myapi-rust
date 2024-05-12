@@ -1,4 +1,5 @@
 use std::fmt;
+use std::cmp;
 
 #[derive(Debug)]
 pub enum HttpStatus {
@@ -25,3 +26,8 @@ impl fmt::Display for HttpStatus {
     }
 }
 
+impl cmp::PartialEq for HttpStatus {
+    fn eq(&self, other: &Self) -> bool {
+        self.as_str() == other.as_str()
+    }
+}

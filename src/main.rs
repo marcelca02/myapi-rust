@@ -21,6 +21,19 @@ async fn main() {
         res.send(&body)
     });
 
+    let hola = app.router("hola");
+
+    hola.get("/mundo", |_req, res| {
+        let body = "Hola Mundo hola".to_string();
+        res.send(&body)
+    });
+
+    // La ruta que se ejecuta es la de app porque tiene el router default
+    app.get("/mundo", |_req, res| {
+        let body = "Hola mundo app".to_string();
+        res.send(&body)
+    });
+
     app.get("/json", |_req, res| {
         let json_message = r#"{"message": "Hello World"}"#;
         res.json(json_message)

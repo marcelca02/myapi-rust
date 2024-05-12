@@ -9,4 +9,5 @@ pub mod config;
 
 pub use server::app::App;
 pub use http::{request::Request,response::Response};
+pub use routing::router::Router;
 

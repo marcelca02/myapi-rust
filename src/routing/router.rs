@@ -96,6 +96,42 @@ impl Router {
         self.register_route(method, path, Box::new(action));
     }
 
+    pub fn get<F>(&mut self, path: &str, action: F) 
+        where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
+    {
+        self.register_route(HttpMethod::GET, path, Box::new(action));
+    }
+
+    pub fn post<F>(&mut self, path: &str, action: F) 
+        where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
+    {
+        self.register_route(HttpMethod::POST, path, Box::new(action));
+    }
+
+    pub fn put<F>(&mut self, path: &str, action: F) 
+        where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
+    {
+        self.register_route(HttpMethod::PUT, path, Box::new(action));
+    }
+
+    pub fn delete<F>(&mut self, path: &str, action: F) 
+        where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
+    {
+        self.register_route(HttpMethod::DELETE, path, Box::new(action));
+    }
+
+    pub fn options<F>(&mut self, path: &str, action: F) 
+        where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
+    {
+        self.register_route(HttpMethod::OPTIONS, path, Box::new(action));
+    }
+
+    pub fn patch<F>(&mut self, path: &str, action: F) 
+        where F: for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static 
+    {
+        self.register_route(HttpMethod::PATCH, path, Box::new(action));
+    }
+
 }
 
 

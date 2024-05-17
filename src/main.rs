@@ -1,5 +1,5 @@
 extern crate myapi_rust;
-use myapi_rust::App;
+use myapi_rust::{App, Response};
 use std::collections::HashMap;
 
 #[tokio::main]
@@ -44,9 +44,24 @@ async fn main() {
         res.send(&body)
     });
 
+    // let mut res = myapi_rust::Response::empty();
+    // res.send_file("hole");
+
     app.get("/json", |_req, res| {
         let json_message = r#"{"message": "Hello World"}"#;
         res.json(json_message)
+    });
+
+    app.get("/foto", |_req, res| {
+        res.send_file("image.png")
+    });
+
+    app.get("/pdf", |_req, res| {
+        res.send_file("Avaluacio_de_projectes.pdf")
+    });
+
+    app.get("/txt", |_req, res| {
+        res.send_file("hola.txt")
     });
 
     app.get("/html", |_req, res| {

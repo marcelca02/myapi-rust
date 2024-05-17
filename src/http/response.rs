@@ -2,6 +2,7 @@
 
 use std::collections::HashMap;
 use std::fmt;
+use std::io::Read;
 
 use crate::http::status::HttpStatus;
 use crate::utils::formatter;
@@ -75,6 +76,45 @@ impl Response {
                 return self;
             }
         }
+    }
+
+    pub fn send_file(&mut self, file_path: &str) -> &mut Self {
+
+        let extension = file_path.split('.').last().unwrap();
+        let content_type = match extension {
+            "pdf" => "application/pdf",
+            "html" => "text/html",
+            "css" => "text/css",
+            "js" => "text/javascript",
+            "png" => "image/png",
+            "jpg" => "image/jpg",
+            "jpeg" => "image/jpeg",
+            "gif" => "image/gif",
+            "svg" => "image/svg+xml",
+            "ico" => "image/x-icon",
+            _ => "text/plain"
+        };
+
+        self.headers.insert("Content-Type".to_string(), content_type.to_string());
+
+        let formatted_path = format!("tests/files/{}", file_path);
+
+        // Read the file
+        match std::fs::File::open(formatted_path) {
+            Ok(mut file) => {
+                let mut body = Vec::new();
+                if let Err(e) = file.read_to_end(&mut body) {
+                    self.status = HttpStatus::InternalServerError;
+                    println!("Error reading file: {}", e);
+                }
+                self.response_body = Some(body);
+            }
+            Err(e) => {
+                self.status = HttpStatus::InternalServerError;
+                println!("Error opening file: {}", e);
+            }
+        } 
+        self
     }
 
     // Empty constructor

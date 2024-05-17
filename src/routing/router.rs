@@ -9,6 +9,7 @@ use crate::http::{methods::HttpMethod,request::Request,response::Response, statu
 pub struct Router {
     routes: HashMap<String, Vec<Route>>,
     num_routes: usize,
+    path: String
 }
 
 unsafe impl Send for Router {}
@@ -25,6 +26,7 @@ impl Clone for Router {
         Router {
             routes: self.routes.clone(),
             num_routes: self.num_routes,
+            path: self.path.clone(),
         }
     }
 }
@@ -46,13 +48,16 @@ impl Router {
         Router {
             routes: methods,
             num_routes: 0,
+            path: "".to_string()
         }
     }
     
     // Private method to create a new Route
     fn register_route(&mut self, method: HttpMethod, path: &str, action: Box<dyn for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response + 'static>) {
         let method = method.to_string();
-        let route = Route::new(path, action);
+        let formated_path = format!("{}{}", self.path, path);
+        println!("Registering route: {} {}", method, formated_path);
+        let route = Route::new(&formated_path, action);
         self.routes.entry(method).or_insert(Vec::new()).push(route);
     }
 
@@ -86,6 +91,18 @@ impl Router {
             },
             None => Response::empty(),
         }
+    }
+
+    pub fn mount(&mut self, path: &str) {
+        self.path = path.to_string();
+    }
+
+    pub fn get_path(&self) -> &str {
+        &self.path
+    }
+
+    pub fn set_path(&mut self, path: &str) {
+        self.path = path.to_string();
     }
     
     // PUBLIC API METHODS

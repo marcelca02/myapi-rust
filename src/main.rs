@@ -28,6 +28,16 @@ async fn main() {
         res.send(&body)
     });
 
+    hola.get("/caracola", |_req, res| {
+        let body = "Hola Caracola hola".to_string();
+        res.send(&body)
+    });
+
+    hola.post("/caracola", |_req, res| {
+        println!("Goodbye Caracola hola");
+        res
+    });
+
     // La ruta que se ejecuta es la de app porque tiene el router default
     app.get("/mundo", |_req, res| {
         let body = "Hola mundo app".to_string();

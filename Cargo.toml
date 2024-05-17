@@ -9,7 +9,7 @@ name = "myapi_rust"
 path = "src/lib.rs"
 
 [dependencies]
-httparse = "1.8.0"
+httparse = "1.8.0"                                  # HTTP parsing (temporary while i don't have self-made parser)
 tokio = { version = "1.37", features = ["net", "sync", "rt-multi-thread", "macros"] }
 
 [dev-dependencies]

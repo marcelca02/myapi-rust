@@ -80,7 +80,10 @@ impl App {
 
     pub fn router(&mut self, name: &str) -> &mut Router {
         self.routers.insert(name.to_string(), Router::new());
-        self.routers.get_mut(name).unwrap()    
+        let router = self.routers.get_mut(name).unwrap();
+        let path = format!("/{}", name);
+        router.set_path(&path);
+        router
     } 
 
     fn handle_connection(cloned: Arc<HashMap<String, Router>>, stream: TcpStream) {

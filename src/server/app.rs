@@ -95,15 +95,15 @@ impl App {
         let request = String::from_utf8_lossy(&buffer[..]);
 
         // Create a new Request object
-        let req = Request::new(&request);
+        let mut req = Request::new(&request);
 
         let mut res = Response::empty();
         
-        match &req {
+        match &mut req {
             Ok(req) => {
                 // Resolve the request
                 for router in cloned.iter() {
-                    let response = router.1.resolve(&req);
+                    let response = router.1.resolve(&mut req.clone());
                     if !response.get_status().eq(&HttpStatus::NotFound) {
                         res = response;
                         break;

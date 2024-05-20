@@ -62,14 +62,25 @@ impl Router {
     }
 
     //Resolvers
-    pub fn resolve_route(&self, req: &Request) -> Option<&Route> { 
+    pub fn resolve_route(&self, req: &mut Request) -> Option<&Route> { 
         let method = req.get_method().to_string();
         let routes = self.routes.get(&method).unwrap();
-        let route = routes.iter().find(|r| r.get_uri() == req.get_uri());
-        match route {
-            Some(r) => Some(r),
-            None => None,
+        // Check regex too
+        for route in routes {
+            println!("Checking route: {} with uri: {}", route.get_uri(), req.get_uri());
+            println!("Route regex: {:?}", route.get_regex());
+            if let Some(captures) = route.get_regex().captures(req.get_uri()) {
+                println!("Matched route: {}", route.get_uri());
+                let mut params = HashMap::new();
+                for (i, name) in route.get_parameters().iter().enumerate() {
+                    let value = captures.get(i + 1).unwrap().as_str().to_string();
+                    params.insert(name.to_string(), value);
+                }
+                req.set_params(&params);
+                return Some(route);
+            }
         }
+        None
     }
 
     //    
@@ -77,7 +88,7 @@ impl Router {
     //  the existance of the route in the routes HashMap of the Aplication server.        //
     //     -->  It will return an empty response if the route is not found.
     //
-    pub fn resolve(&self, req: &Request) -> Response { 
+    pub fn resolve(&self, req: &mut Request) -> Response { 
 
         let route = self.resolve_route(req);
         match route {
@@ -168,8 +179,8 @@ mod test_router {
 
 
         let req_str = "GET /hello HTTP/1.1\r\nHost: localhost:4221\r\nUser-Agent: curl/7.68.0\r\nAccept: */*\r\n\r\n";
-        let req = Request::new(req_str).unwrap();
-        let res = router.resolve(&req);
+        let mut req = Request::new(req_str).unwrap();
+        let res = router.resolve(&mut req);
         assert_eq!(res.get_status().to_string(), "200 OK");
     }
 
@@ -181,8 +192,8 @@ mod test_router {
         let router = Router::new();
 
         let req_str = "GET /world HTTP/1.1\r\nHost: localhost:4221\r\nUser-Agent: curl/7.68.0\r\nAccept: */*\r\n\r\n";
-        let req = Request::new(req_str).unwrap();
-        let res = router.resolve(&req);
+        let mut req = Request::new(req_str).unwrap();
+        let res = router.resolve(&mut req);
         assert_eq!(res.get_status().to_string(), "404 Not Found");
     }
 
@@ -195,8 +206,8 @@ mod test_router {
         router.store_route(crate::http::methods::HttpMethod::GET, "/hello", |_req, res| {
             res
         });
-        let req = Request::new("GET /hello HTTP/1.1\r\nHost: localhost:4221\r\nUser-Agent: curl/7.68.0\r\nAccept: */*\r\n\r\n").unwrap();
-        let res = router.resolve(&req);
+        let mut req = Request::new("GET /hello HTTP/1.1\r\nHost: localhost:4221\r\nUser-Agent: curl/7.68.0\r\nAccept: */*\r\n\r\n").unwrap();
+        let res = router.resolve(&mut req);
         assert_eq!(res.get_status().to_string(), "200 OK");
     }
 
@@ -206,8 +217,8 @@ mod test_router {
         use crate::routing::router::Router;
 
         let router = Router::new();
-        let req = Request::new("GET /world HTTP/1.1\r\nHost: localhost:4221\r\nUser-Agent: curl/7.68.0\r\nAccept: */*\r\n\r\n").unwrap();
-        let res = router.resolve(&req);
+        let mut req = Request::new("GET /world HTTP/1.1\r\nHost: localhost:4221\r\nUser-Agent: curl/7.68.0\r\nAccept: */*\r\n\r\n").unwrap();
+        let res = router.resolve(&mut req);
         assert_eq!(res.get_status().to_string(), "404 Not Found");
     }
 

@@ -81,21 +81,20 @@ impl Response {
     pub fn send_file(&mut self, file_path: &str) -> &mut Self {
 
         let extension = file_path.split('.').last().unwrap();
-        let content_type = match extension {
-            "pdf" => "application/pdf",
-            "html" => "text/html",
-            "css" => "text/css",
-            "js" => "text/javascript",
-            "png" => "image/png",
-            "jpg" => "image/jpg",
-            "jpeg" => "image/jpeg",
-            "gif" => "image/gif",
-            "svg" => "image/svg+xml",
-            "ico" => "image/x-icon",
-            _ => "text/plain"
+        let file_name = file_path.split('/').last().unwrap();
+        match extension {
+            "html" => self.headers.insert("Content-Type".to_string(), "text/html".to_string()),
+            "png" => self.headers.insert("Content-Type".to_string(), "image/png".to_string()),
+            "jpg" => self.headers.insert("Content-Type".to_string(), "image/jpg".to_string()),
+            "jpeg" => self.headers.insert("Content-Type".to_string(), "image/jpeg".to_string()),
+            "pdf" => {
+                self.headers.insert("Content-Disposition".to_string(), format!("attachment; filename=\"{}\"", file_name)); 
+                self.headers.insert("Content-Type".to_string(), "application/pdf".to_string())
+            },
+            _ => self.headers.insert("Content-Type".to_string(), "text/plain".to_string()),
         };
 
-        self.headers.insert("Content-Type".to_string(), content_type.to_string());
+
 
         let formatted_path = format!("tests/files/{}", file_path);
 

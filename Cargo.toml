@@ -10,6 +10,7 @@ path = "src/lib.rs"
 
 [dependencies]
 httparse = "1.8.0"                                  # HTTP parsing (temporary while i don't have self-made parser)
+regex = "1.10.4"
 tokio = { version = "1.37", features = ["net", "sync", "rt-multi-thread", "macros"] }
 
 [dev-dependencies]

@@ -1,13 +1,15 @@
 // Route structure for handling routes in the server api
 use std::sync::{Arc, Mutex};
+use regex::Regex;
 
 use crate::http::{request::Request, response::Response};
+use crate::utils::formatter;
 
 pub struct Route {
     uri: String,
     action: Arc<Mutex<Box<dyn for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response>>>,
     parameters: Vec<String>,
-    // TODO: Implement regex for uri and middlewares
+    regex: Regex,
 }
 
 
@@ -23,23 +25,31 @@ impl Clone for Route {
             uri: self.uri.clone(),
             action: self.action.clone(),
             parameters: self.parameters.clone(),
+            regex: self.regex.clone(),
         }
     }
 }
 
 impl Route {
     pub fn new(uri: &str, action: Box<dyn for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response>) -> Self {
+        let mut params = Vec::new();
+        let regex_str = formatter::format_regex(uri, &mut params);
+        let regex = Regex::new(&regex_str).expect("Error creating regex");
         Route {
             uri: uri.to_string(),
             action: Arc::new(Mutex::new(action)),
-            parameters: Vec::new(),
-            // regex: Regex::new(uri).unwrap(),
+            parameters: params,
+            regex,
             // middlewares: Vec::new(),
         }
     }
 
     pub fn get_uri(&self) -> &str {
         &self.uri
+    }
+
+    pub fn get_regex(&self) -> &Regex {
+        &self.regex
     }
 
     pub fn get_action(&self) -> Arc<Mutex<Box<dyn for<'a> Fn(&'a Request, &'a mut Response) -> &'a mut Response>>> {

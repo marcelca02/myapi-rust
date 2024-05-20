@@ -11,9 +11,9 @@ pub struct Request {
     version: String,
     uri: String,
     method: HttpMethod,
+    params: HashMap<String, String>,
     body_data: Option<Vec<u8>>,
     headers: HashMap<String, u8>
-    //TODO: parameters and files
 }
 
 impl std::fmt::Debug for Request {
@@ -36,16 +36,18 @@ impl Request {
             version: "HTTP/1.1".to_string(),
             uri: "".to_string(),
             method: HttpMethod::GET,
+            params: HashMap::new(),
             body_data: None,
             headers: HashMap::new()
         }
     }
 
-    pub fn create(uri: &str,  method: HttpMethod, data: Vec<u8>, headers: HashMap<String, u8>) -> Self {
+    pub fn create(uri: &str,  method: HttpMethod, params: HashMap<String, String>, data: Vec<u8>, headers: HashMap<String, u8>) -> Self {
         Request {
             version: "HTTP/1.1".to_string(),
             uri: uri.to_string(), 
             method,
+            params,
             body_data: Some(data),
             headers
         }
@@ -53,7 +55,7 @@ impl Request {
 
     pub fn new(request: &str) -> Result<Self, std::io::Error> {
         let mut req = Request::empty();
-        match parsers::parse_request(request.to_string(), &mut req) {
+        match parsers::parse_request(request.to_string(), &mut  req) {
             Ok(_) => Ok(req),
             Err(err) => Err(err)
         }
@@ -101,5 +103,17 @@ impl Request {
 
     pub fn set_header_field(&mut self, key: &str, value: u8) {
         self.headers.insert(key.to_string(), value);
+    }
+
+    pub fn get_params(&self) -> &HashMap<String, String> {
+        &self.params
+    }
+
+    pub fn set_params(&mut self, params: &HashMap<String, String>) {
+        self.params = params.clone();
+    }
+
+    pub fn get_param(&self, key: &str) -> Option<&String> {
+        self.params.get(key)
     }
 }

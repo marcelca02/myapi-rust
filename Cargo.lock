@@ -588,6 +588,7 @@ dependencies = [
  "criterion",
  "httparse",
  "pretty_assertions",
+ "regex",
  "reqwest",
  "tokio",
 ]

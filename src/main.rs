@@ -1,5 +1,5 @@
 extern crate myapi_rust;
-use myapi_rust::{App, Response};
+use myapi_rust::App;
 use std::collections::HashMap;
 
 #[tokio::main]
@@ -20,6 +20,20 @@ async fn main() {
         let body = "Goodbye World".to_string();
         res.send(&body)
     });
+
+    app.get("/hey/:name/:lastname", |req, res| {
+        let name = req.get_param("name").unwrap();
+        let lastname = req.get_param("lastname").unwrap();
+        let body = format!("Buenas {} {}", name, lastname);
+        res.send(&body)
+    });
+
+    app.get("/buenas/:name", |req, res| {
+        let name = req.get_param("name").unwrap();
+        let body = format!("Buenas {}", name);
+        res.send(&body)
+    });
+
 
     let hola = app.router("hola");
 
@@ -43,9 +57,6 @@ async fn main() {
         let body = "Hola mundo app".to_string();
         res.send(&body)
     });
-
-    // let mut res = myapi_rust::Response::empty();
-    // res.send_file("hole");
 
     app.get("/json", |_req, res| {
         let json_message = r#"{"message": "Hello World"}"#;

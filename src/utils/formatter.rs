@@ -25,3 +25,18 @@ pub fn format_html(file_path: &str, params: HashMap<String, String>) -> Result<S
 
     Ok(content)
 }
+
+pub fn format_regex(path: &str, params: &mut Vec<String>) -> String {
+    let mut regex = String::new();
+    regex.push_str("^");
+    for (_, part) in path.split('/').enumerate() {
+        if part.starts_with(':') {
+            regex.push_str("/([^/]+)");
+            params.push(part[1..].to_string());
+        } else if part != "" {
+            regex.push_str("/");
+            regex.push_str(part);
+        }
+    }
+    regex
+}
